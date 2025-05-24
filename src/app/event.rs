@@ -31,7 +31,11 @@ impl<'a> Handler for App<'a> {
                 }
                 KeyCode::Char('d') => {
                     let index = self.active_index;
+                    if index == self.ideas.len() - 1 {
+                        self.active_index -= 1;
+                    }
                     self.remove_idea(index);
+                    self.save();
                 }
                 KeyCode::Up => {
                     if self.active_index != 0 {
@@ -70,16 +74,22 @@ impl<'a> Handler for App<'a> {
                         match focus {
                             Focus::Title => {
                                 self.buffer[0].push(char);
-                                self.cursor_position.0 += 1;
+                                self.title_view.set_buffer(&self.buffer[0]);
+                                self.cursor_position =
+                                    self.title_view.get_last_word_cursor_position();
                             }
+
                             Focus::Description => {
                                 self.buffer[1].push(char);
-                                self.cursor_position.0 += 1;
+                                self.description_view.set_buffer(&self.buffer[1]);
+                                self.cursor_position =
+                                    self.description_view.get_last_word_cursor_position();
                             }
                             _ => {}
                         }
                     }
                 }
+
                 KeyCode::Enter => {
                     let title = &self.buffer[0].clone();
                     let description = &self.buffer[1].clone();
@@ -88,6 +98,7 @@ impl<'a> Handler for App<'a> {
                     self.focus = Some(Focus::Title);
                     self.save()
                 }
+
                 KeyCode::Backspace => {
                     if let Some(focus) = &self.focus {
                         match focus {
@@ -108,7 +119,6 @@ impl<'a> Handler for App<'a> {
                                 self.focus = {
                                     let sanitized = self.buffer[0].trim();
                                     if sanitized != "" {
-                                        self.cursor_position.0 = self.buffer[1].len() as u16;
                                         Some(Focus::Description)
                                     } else {
                                         Some(Focus::Title)
@@ -117,7 +127,6 @@ impl<'a> Handler for App<'a> {
                             }
                             Focus::Description => {
                                 self.focus = Some(Focus::Add);
-                                self.cursor_position.0 = self.buffer[1].len() as u16;
                             }
                             Focus::Add => self.focus = Some(Focus::Title),
                         }

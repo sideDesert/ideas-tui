@@ -35,8 +35,9 @@ impl<'a> Render<'a> for App<'a> {
             ])
             .areas(rect_child);
 
-        let title_text = &self.buffer[0];
-        let description_text = &self.buffer[1];
+        // let title_text = &self.buffer[0];
+        // let description_text = &self.buffer[1];
+
         let title_style;
         let desc_style;
         let border_style;
@@ -50,12 +51,13 @@ impl<'a> Render<'a> for App<'a> {
                 button_style = passive_button_style;
                 border_style = passive_border_style;
 
-                self.cursor_position.0 = title_area.x + 1 + self.buffer[0].len() as u16;
-                self.cursor_position.1 = title_area.y + 1;
+                self.cursor_offset.0 = title_area.x + 1;
+                self.cursor_offset.1 = title_area.y + 1;
 
+                self.title_view.set_width(48);
                 frame.set_cursor_position(Position::new(
-                    self.cursor_position.0,
-                    self.cursor_position.1,
+                    self.cursor_offset.0 + self.title_view.get_last_word_cursor_position().0,
+                    self.cursor_offset.1,
                 ));
             }
             Focus::Description => {
@@ -64,14 +66,15 @@ impl<'a> Render<'a> for App<'a> {
                 button_style = passive_button_style;
                 border_style = passive_border_style;
 
-                self.cursor_position.0 = description_area.x + 1 + self.buffer[1].len() as u16;
-                self.cursor_position.1 = description_area.y + 1;
+                self.cursor_offset.0 = description_area.x + 1;
+                self.cursor_offset.1 = description_area.y + 1;
 
                 frame.set_cursor_position(Position::new(
-                    self.cursor_position.0,
-                    self.cursor_position.1,
+                    self.cursor_offset.0 + self.description_view.get_last_word_cursor_position().0,
+                    self.description_view.get_last_word_cursor_position().1 + self.cursor_offset.1,
                 ));
             }
+
             Focus::Add => {
                 title_style = passive_style;
                 desc_style = passive_style;
@@ -80,16 +83,21 @@ impl<'a> Render<'a> for App<'a> {
             }
         }
 
-        let title_input = Paragraph::new(Line::from(title_text.clone()))
-            .block(Block::default().borders(Borders::ALL).title("Title"))
+        let title_block = Block::default()
+            .borders(Borders::ALL)
+            .title("Title")
             .style(title_style);
 
-        let description_input = Paragraph::new(Line::from(description_text.clone())).block(
-            Block::default()
-                .borders(Borders::ALL)
-                .title("Description")
-                .style(desc_style),
-        );
+        self.title_view.set_width(title_area.width);
+        self.title_view.set_buffer(&self.buffer[0]);
+
+        let desc_block = Block::default()
+            .borders(Borders::ALL)
+            .title("Description")
+            .style(desc_style);
+
+        self.description_view.set_width(title_area.width);
+        self.description_view.set_buffer(&self.buffer[1]);
 
         let chunks = Layout::default()
             .direction(Direction::Horizontal)
@@ -106,9 +114,10 @@ impl<'a> Render<'a> for App<'a> {
         let button_text = Paragraph::new("  + Add Idea").block(button_block);
 
         frame.render_widget(block, rect);
-        frame.render_widget(title_input, title_area);
 
-        frame.render_widget(description_input, description_area);
+        self.title_view.render(frame, title_block, title_area);
+        self.description_view
+            .render(frame, desc_block, description_area);
         frame.render_widget(button_text, button_area);
     }
 
@@ -152,8 +161,8 @@ impl<'a> Render<'a> for App<'a> {
                 button_style = passive_button_style;
                 border_style = passive_border_style;
 
-                self.cursor_position.0 = title_area.x + self.buffer[0].len() as u16 + 1;
-                self.cursor_position.1 = title_area.y + 1;
+                // self.cursor_position.0 = title_area.x + self.buffer[0].len() as u16 + 1;
+                // self.cursor_position.1 = title_area.y + 1;
 
                 frame.set_cursor_position(Position::new(
                     self.cursor_position.0,
@@ -166,8 +175,8 @@ impl<'a> Render<'a> for App<'a> {
                 button_style = passive_button_style;
                 border_style = passive_border_style;
 
-                self.cursor_position.0 = description_area.x + self.buffer[1].len() as u16 + 1;
-                self.cursor_position.1 = description_area.y + 1;
+                // self.cursor_position.0 = description_area.x + self.buffer[1].len() as u16 + 1;
+                // self.cursor_position.1 = description_area.y + 1;
 
                 frame.set_cursor_position(Position::new(
                     self.cursor_position.0,

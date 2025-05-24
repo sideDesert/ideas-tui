@@ -1,8 +1,10 @@
+mod buffer;
 mod event;
 mod render;
 mod state;
 mod utils;
 
+use buffer::View;
 use event::Handler;
 use render::Render;
 use std::{io::BufReader, path::PathBuf};
@@ -54,7 +56,10 @@ pub struct App<'a> {
     focus: Option<Focus>,
     mode: Mode,
     buffer: &'a mut [String; 2],
+    title_view: View,
+    description_view: View,
     cursor_position: (u16, u16),
+    cursor_offset: (u16, u16),
     path: PathBuf,
     active_index_path: PathBuf,
 }
@@ -84,8 +89,11 @@ impl<'a> App<'a> {
             active_index: 0,
             focus: None,
             ideas: Vec::new(),
+            title_view: View::new(),
+            description_view: View::new(),
             buffer: buf,
             cursor_position: (0, 0),
+            cursor_offset: (0, 0),
         }
     }
 
