@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Build Vanshika App",
+    "description": "Build a watch party app using Webrtc + SFU + xrandr"
+  },
+  {
+    "title": "Socket Programming",
+    "description": "Learn socket programming from Beej's guide to socket programming"
+  },
+  {
+    "title": "Improve Ideas App",
+    "description": "Improve Ideas UI and add more features"
+  },
+  {
+    "title": "TUI Dashboard",
+    "description": "Play music, look at ideas, and other stuff from ther terminal"
+  },
+  {
+    "title": "NVIM easy file access extension",
+    "description": ""
+  },
+  {
+    "title": "Linkedin JOB Web Crawler",
+    "description": "A web crawler in go which will scrape for jobs and apply for them using AI"
+  },
+  {
+    "title": "Realtime Collaboration Document Editing",
+    "description": "Basically something like google word doc to understand the technology"
+  },
+  {
+    "title": "Create your own green schedular",
+    "description": "Basically creating a co-routine like thing in  rust or C"
+  }
+]
